@@ -19,8 +19,22 @@ impl Node {
         self.children.push(child);
     }
 
+}
+
+#[derive(Debug)]
+struct Tree {
+    root: Node,
+}
+
+impl Tree {
+    fn new(root: Node) -> Tree {
+        Tree {
+            root,
+        }
+    }
+
     fn find(&self, val: i32) -> Option<Node> {
-        let mut to_visit_stack: Vec<Node> = vec![self.clone()];
+        let mut to_visit_stack: Vec<Node> = vec![self.root.clone()];
         
         while !to_visit_stack.is_empty() {
             let current: Node = to_visit_stack.pop().unwrap();
@@ -34,14 +48,8 @@ impl Node {
         }
         None
     }
-}
 
-struct Tree {
-    root: Node,
-}
-
-impl Tree {
-    fn minDepth(&self) -> i32 {
+    fn min_depth(&self) -> i32 {
         //count depth until we reach the first leaf
         let root = vec![self.root.clone()];
         let mut to_visit_queue = VecDeque::new();
@@ -50,18 +58,19 @@ impl Tree {
 
         while !to_visit_queue.is_empty() {
             let current_rank_deque = to_visit_queue.pop_front().unwrap();
-            let mut next_children: Vec<Node> = vec![];
+            let mut next_children = Vec::new();
     
             for neighbor in current_rank_deque {
-                if neighbor.children.is_empty() {
-                    //break while loop
+                let mut neighbor_children = neighbor.children.clone();
+                if neighbor_children.is_empty() {
+                    return depth
                 } else {
-                    next_children.append(neighbor.children)
+                    next_children.append(&mut neighbor_children)
                 }
             }
 
             if !next_children.is_empty() {
-                to_visit_queue.append(next_children);
+                to_visit_queue.push_back(next_children);
             }
 
             depth += 1;
@@ -87,4 +96,11 @@ fn main() {
     root_node.add_child(Node::new(4));
 
 
+    let tree = Tree::new(root_node);
+
+    println!("Here is your tree: {:#?}", tree);
+
+    println!("Looking for node with value of 3: {:#?}", &tree.find(3).expect("Could not find node with that value!"));
+
+    println!("Minimum Node Depth: {}", &tree.min_depth());
 }
