@@ -56,7 +56,7 @@ impl Tree {
         to_visit_queue.push_back(root);
         let mut depth = 0;
 
-        while !to_visit_queue.is_empty() {
+        loop {
             let current_rank_deque = to_visit_queue.pop_front().unwrap();
             let mut next_children = Vec::new();
     
@@ -65,17 +65,13 @@ impl Tree {
                 if neighbor_children.is_empty() {
                     return depth
                 } else {
-                    next_children.append(&mut neighbor_children)
+                    next_children.append(&mut neighbor_children);
                 }
             }
 
-            if !next_children.is_empty() {
-                to_visit_queue.push_back(next_children);
-            }
-
+            to_visit_queue.push_back(next_children);
             depth += 1;
         }
-        depth
     }
 }
 
