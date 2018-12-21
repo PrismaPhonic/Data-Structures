@@ -1,6 +1,7 @@
 use std::collections::VecDeque;
 use std::collections::HashSet;
 
+
 #[derive(Hash, Eq, PartialEq, Debug)]
 pub struct Node<'a> {
     pub value: char,
@@ -9,11 +10,15 @@ pub struct Node<'a> {
 
 impl<'a> Node<'a> {
     pub fn new(value: char) -> Node<'a> {
-        let adjacent: Vec<&'a Node<'a>> = Vec::new();
+        let adjacent = Vec::new();
         Node {
             value,
             adjacent,
         }
+    }
+
+    pub fn add_edge(&mut self, other: &'a Self) -> () {
+        self.adjacent.push(other); 
     }
 }
 
@@ -79,5 +84,17 @@ mod tests {
         
         assert!(graph.contains(&a));
         assert_eq!(graph.contains(&b), true);
+    }
+    
+    #[test]
+    fn add_edge() {
+        let mut a: Node = Node::new('A');
+        let b: Node = Node::new('B');
+        
+        a.add_edge(&b);
+        // b.add_edge(&a);
+
+        assert_eq!(a.adjacent.contains(&&b), true);
+        assert_eq!(b.adjacent.contains(&&a), false);
     }
 }
