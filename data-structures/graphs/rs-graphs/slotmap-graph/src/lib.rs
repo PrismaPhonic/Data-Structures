@@ -1,51 +1,58 @@
 use std::collections::VecDeque;
 use std::collections::HashSet;
 
+extern crate slotmap;
+use slotmap::{new_key_type, Key, SlotMap, Slottable};
 
-#[derive(Hash, Eq, PartialEq, Debug)]
-pub struct Node<'a> {
-    pub value: char,
-    pub adjacent: Vec<&'a Node<'a>>,
+new_key_type! {
+    struct ListKey;
 }
 
-impl<'a> Node<'a> {
-    pub fn new(value: char) -> Node<'a> {
-        let adjacent = Vec::new();
+
+#[derive(Copy, Clone, Debug)]
+pub struct Node<T> {
+    pub value: T,
+    pub adjacent: ListKey,
+}
+
+impl<T> Node<T> {
+    pub fn new(value: char) -> Node<T> {
+        let adjacent = HashSet::new();
         Node {
             value,
             adjacent,
         }
     }
 
-    pub fn add_edge(&mut self, other: &'a Self) -> () {
-        self.adjacent.push(other); 
+    pub fn add_edge(&mut self, other: ListKey) -> () {
+        self.adjacent.insert(other); 
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct Graph<'a> {
-    pub nodes: HashSet<&'a Node<'a>>,
+pub struct Graph<T> {
+    pub nodes: SlotMap<ListKey, Node<T>>,
 }
 
-impl<'a> Graph<'a> {
-    pub fn add_vertex(&mut self, vertex: &'a Node) {
-        self.nodes.insert(&vertex);
+impl<T> Graph<T> {
+    pub fn add_vertex(&mut self, vertex: ListKey) {
+        self.nodes.insert(vertex);
     }
 
-    pub fn new() -> Graph<'a> {
-        let nodes: HashSet<&Node> = HashSet::new();
+    pub fn new() -> Graph<T> {
+        let nodes: SlotMap<ListKey, Node<T>> = SlotMap::new();
         Graph {
             nodes,
         }
     }
 
-    pub fn contains(&self, vertex: &'a Node) -> bool {
-        self.nodes.contains(&vertex)
+    pub fn contains(&self, vertex: ListKey) -> bool {
+        self.nodes.contains_key(ListKey)
     }
 
     // Designed to consume vertex_array as I can't imagine why you would need
     // to keep it in scope - our entire graph system is built around hashsets
-    pub fn add_vertices(&mut self, vertex_array: [&'a Node; 2]) {
+    pub fn add_vertices(&mut self, vertex_array: [ListKey; 2]) {
         for vertex in vertex_array.iter() {
             self.nodes.insert(&vertex);
         }
