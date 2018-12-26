@@ -112,6 +112,40 @@ impl<T> Tree<T> {
         }
        recurse_depth(self, self.root, 0, 0)
     }
+
+    pub fn max_depth_iter(&self) -> usize {
+        let mut depth = 0;
+        let root = Current::new(self.root, depth);
+        let mut to_visit_stack: Vec<Current> = vec![root];
+        let mut max = 0;
+
+        while !to_visit_stack.is_empty() {
+            let current = to_visit_stack.pop().unwrap();
+            depth = current.depth;
+            if depth > max { max = depth }
+            self.nodes[&current.node].children.iter().for_each(|c| {
+               to_visit_stack.push(Current::new(*c, depth + 1)); 
+            });
+        }
+
+        max
+    }
+}
+
+// created specifically for testing iter vs recursive solutions for max
+// depth functions - results - same efficiency in benchmarking
+struct Current {
+    depth: usize,
+    node: usize,
+}
+
+impl Current {
+    fn new(node: usize, depth: usize) -> Current {
+        Current {
+            depth,
+            node,
+        }
+    }
 }
 
 #[cfg(test)]
@@ -213,9 +247,100 @@ mod tests {
 
         assert_eq!(tree.max_depth_recursive(), 2);
     }
+
+    #[test]
+    fn max_depth_iter() {
+        let mut tree = Tree::new(); 
+        let one = tree.new_node(1);
+        let two = tree.new_node(2);
+        let three = tree.new_node(3);
+        let four = tree.new_node(4);
+        let five = tree.new_node(5);
+        let six = tree.new_node(6);
+        let seven = tree.new_node(7);
+        let eight = tree.new_node(8);
+
+        tree.add_child_to_node(one, two);
+        tree.add_child_to_node(one, three);
+        tree.add_child_to_node(one, four);
+
+        tree.add_child_to_node(two, five);
+        tree.add_child_to_node(two, six);
+
+        tree.add_child_to_node(three, seven);
+        tree.add_child_to_node(three, eight);
+
+        assert_eq!(tree.max_depth_iter(), 2);
+    }
+
+    #[bench]
+    fn max_depth_recursive_bench(b: &mut Bencher) {
+        let mut tree = Tree::new(); 
+        let one = tree.new_node(1);
+        let two = tree.new_node(2);
+        let three = tree.new_node(3);
+        let four = tree.new_node(4);
+        let five = tree.new_node(5);
+        let six = tree.new_node(6);
+        let seven = tree.new_node(7);
+        let eight = tree.new_node(8);
+        let nine = tree.new_node(9);
+        let ten = tree.new_node(10);
+        let eleven = tree.new_node(11);
+        let twelve = tree.new_node(12);
+
+        tree.add_child_to_node(one, two);
+        tree.add_child_to_node(one, three);
+        tree.add_child_to_node(one, four);
+
+        tree.add_child_to_node(two, five);
+        tree.add_child_to_node(two, six);
+
+        tree.add_child_to_node(three, seven);
+        tree.add_child_to_node(three, eight);
+
+        tree.add_child_to_node(five, nine);
+        tree.add_child_to_node(five, ten);
+        
+        tree.add_child_to_node(ten, eleven);
+        tree.add_child_to_node(ten, twelve);
+        
+        b.iter(|| tree.max_depth_recursive());
+    }
+
+    #[bench]
+    fn max_depth_iter_bench(b: &mut Bencher) {
+        let mut tree = Tree::new(); 
+        let one = tree.new_node(1);
+        let two = tree.new_node(2);
+        let three = tree.new_node(3);
+        let four = tree.new_node(4);
+        let five = tree.new_node(5);
+        let six = tree.new_node(6);
+        let seven = tree.new_node(7);
+        let eight = tree.new_node(8);
+        let nine = tree.new_node(9);
+        let ten = tree.new_node(10);
+        let eleven = tree.new_node(11);
+        let twelve = tree.new_node(12);
+
+        tree.add_child_to_node(one, two);
+        tree.add_child_to_node(one, three);
+        tree.add_child_to_node(one, four);
+
+        tree.add_child_to_node(two, five);
+        tree.add_child_to_node(two, six);
+
+        tree.add_child_to_node(three, seven);
+        tree.add_child_to_node(three, eight);
+
+        tree.add_child_to_node(five, nine);
+        tree.add_child_to_node(five, ten);
+        
+        tree.add_child_to_node(ten, eleven);
+        tree.add_child_to_node(ten, twelve);
+        
+        b.iter(|| tree.max_depth_iter());
+    }
     
-    // #[bench]
-    // fn bench_shortest_path(b: &mut Bencher) {
-    //     b.iter(|| graph.shortest_path(p, w));
-    // }
 }
