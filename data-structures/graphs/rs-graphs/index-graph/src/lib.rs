@@ -101,8 +101,7 @@ impl<T> Graph<T> {
     
     pub fn shortest_path(&self, start: usize, end: usize) -> i32 {
         let mut queue = VecDeque::new();
-        let first = vec![start];
-        queue.push_back(first);
+        queue.push_back(vec![start]);
         let mut visited = HashSet::new();
         visited.insert(start);
         let mut count = 0;
@@ -131,8 +130,6 @@ impl<T> Graph<T> {
         }
     }
 }
-
-
 
 #[cfg(test)]
 mod tests {
@@ -274,6 +271,6 @@ mod tests {
         graph.link_nodes(r, t);
         graph.link_nodes(w, t);
 
-        b.iter(|| graph.shortest_path(s, t));
+        b.iter(|| graph.shortest_path(p, w));
     }
 }
