@@ -1,0 +1,8 @@
+[package]
+name = "count-zeroes"
+version = "0.1.0"
+authors = ["Peter Farr <Peter@PrismaPhonic.com>"]
+edition = "2018"
+
+[dependencies]
+libmath = "0.2.1"
